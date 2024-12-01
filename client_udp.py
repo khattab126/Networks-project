@@ -1,19 +1,23 @@
 import socket
 
-def start_udp_client(host='127.0.0.1', port=12345):
-    # Create a UDP socket
+def send_dhcp_discover():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-
-    # Send a message (this could be a DHCP Discover message)
-    message = "DHCP Discover"  # Placeholder for DHCP message
-    client_socket.sendto(message.encode(), (host, port))
-
-    # Receive the response
-    response, server_address = client_socket.recvfrom(1024)
+    client_socket.sendto("DHCP_DISCOVER".encode(), ('127.0.0.1', 12345))
+    
+    response, _ = client_socket.recvfrom(1024)
     print(f"Received from server: {response.decode()}")
-
-    # Close socket
+    
+    # Simulate sending a valid DHCP Request
+    client_socket.sendto("DHCP_REQUEST".encode(), ('127.0.0.1', 12345))
+    response, _ = client_socket.recvfrom(1024)
+    print(f"Received from server: {response.decode()}")
+    
+    # Simulate sending an invalid DHCP message (which should trigger a DHCP NAK)
+    client_socket.sendto("INVALID_DHCP_REQUEST".encode(), ('127.0.0.1', 12345))
+    response, _ = client_socket.recvfrom(1024)
+    print(f"Received from server: {response.decode()}")
+    
     client_socket.close()
 
-# Start client
-start_udp_client()
+if __name__ == "__main__":
+    send_dhcp_discover()

@@ -1,20 +1,19 @@
 import socket
 
-def start_tcp_client(host='127.0.0.1', port=12345):
-    # Create a TCP socket
+def send_http2_request():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect((host, port))
+    client_socket.connect(('127.0.0.1', 12345))
+    client_socket.send("GET / HTTP/1.1".encode())
 
-    # Send a request (this could be an HTTP/2 request or DNS query format)
-    request = "GET / HTTP/2 Request"  # Placeholder request for HTTP/2 or DNS
-    client_socket.send(request.encode())
-
-    # Receive the response
+    # Receive main HTTP/2 response
     response = client_socket.recv(1024).decode()
     print(f"Received from server: {response}")
-
-    # Close connection
+    
+    # Receive pushed data (additional resources)
+    pushed_data = client_socket.recv(1024).decode()
+    print(f"Received pushed data: {pushed_data}")
+    
     client_socket.close()
 
-# Start client
-start_tcp_client()
+if __name__ == "__main__":
+    send_http2_request()
